@@ -1,0 +1,38 @@
+package domain;
+
+public class Persona {
+
+	//arreglo para objeto REFERENCIA A OBJETOS
+	
+
+	//definimos un atributo de tipo String llamado nombre
+	private String nombre;
+	
+	
+	//creamos un constructor con 1 parametro de tipo String y que se iguala lo que tenga el atributo nombre a lo q tenga el parametro nombre
+	public Persona(String nombre) {
+		this.nombre = nombre;
+	}
+	
+	
+	public String getNombre() {
+		return this.nombre;
+	}
+	
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	//creamos un metodo toString
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Persona [nombre=");
+		builder.append(nombre);
+		builder.append("]");
+		builder.append(" ,").append(super.toString());
+		return builder.toString();
+	}
+	 
+	
+}
