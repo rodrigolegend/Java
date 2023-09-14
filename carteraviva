@@ -1,0 +1,99 @@
+import java.io.OutputStream;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import com.sterlingcommerce.woodstock.workflow.Document;
+import com.sterlingcommerce.woodstock.workflow.WorkFlowContext;
+import mx.santander.cnf.reportesODS.Main;
+import mx.santander.cnf.reportesODS.Utils.ConstantesReportesUtils;
+import mx.santander.cnf.reportesODS.Utils.ReporteCarteraVivaODS;
+import mx.santander.cnf.reportesODS.bean.EntradasReportesBean;
+import mx.santander.cnf.reportesODS.bean.SalidaReportesBean;
+	
+		     Main principal= new Main();
+		        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyLLdd");
+				String strDate = wfc.getParm("Fecha");		
+				LocalDate fecha = LocalDate.parse(strDate);
+				String Pool = wfc.getParm("Pool");
+				String DriverClass = wfc.getParm("DriverClass");
+				String proceso = "error";
+		        
+		    	String QueryVivaComisionC05 = wfc.getParm("QueryVivaComisionC05");
+				String QueryVivaComisionC06 = wfc.getParm("QueryVivaComisionC06");
+				String QueryVivaComisionC11 = wfc.getParm("QueryVivaComisionC11");
+                String QueryVivaCuentasContables = wfc.getParm("QueryVivaCuentasContables");
+                String QueryVivaFacturas = wfc.getParm("QueryVivaFacturas");
+				String QueryVivaMonedaBase = wfc.getParm("QueryVivaMonedaBase");
+				String QueryVivaSobretasaFacturaFinanciadaSM = wfc.getParm("QueryVivaSobretasaFacturaFinanciadaSM");
+				String QueryVivaSobretasaFacturaFinanciadaCM = wfc.getParm("QueryVivaSobretasaFacturaFinanciadaCM");
+				String QueryVivaSobretasaPlazosFacturaFinanciadaSM = wfc.getParm("QueryVivaSobretasaPlazosFacturaFinanciadaSM");
+				String QueryVivaSobretasaPlazosFacturaFinanciadaCM = wfc.getParm("QueryVivaSobretasaPlazosFacturaFinanciadaCM");
+				String QueryVivaObtenerCDREFERE = wfc.getParm("QueryVivaObtenerCDREFERE");
+				String QueryVivaObtenerTipoInteresVariable = wfc.getParm("QueryVivaObtenerTipoInteresVariable");
+				String QueryVivaObtenerMonedaLimiteOperacion = wfc.getParm("QueryVivaObtenerMonedaLimiteOperacion");
+				String QueryVivaObtenerLimiteEmpresa = wfc.getParm("QueryVivaObtenerLimiteEmpresa");
+				String QueryVivaObtenerLimiteGrupo = wfc.getParm("QueryVivaObtenerLimiteGrupo");
+				String QueryVivaObtenerInteresDevengado = wfc.getParm("QueryVivaObtenerInteresDevengado");
+				String QueryVivaObtenerLimiteContrato = wfc.getParm("QueryVivaObtenerLimiteContrato");
+
+		        EntradasReportesBean entradaCarteraViva = new EntradasReportesBean();
+				Map  informacionReporteCarteraViva = new HashMap();
+				informacionReporteCarteraViva.put(ConstantesReportesUtils.POOL, Pool);
+				informacionReporteCarteraViva.put(ConstantesReportesUtils.CLASS_FORNAME, DriverClass);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_COMISION_C05,QueryVivaComisionC05);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_COMISION_C06,QueryVivaComisionC06);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_COMISION_C11,QueryVivaComisionC11);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_CUENTAS_CONTABLES,QueryVivaCuentasContables);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_FACTURAS,QueryVivaFacturas);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_MONEDA_BASE,QueryVivaMonedaBase);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_OBTENER_CDREFERE,QueryVivaObtenerCDREFERE);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_OBTENER_INTERES_DEVENGADO,QueryVivaObtenerInteresDevengado);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_OBTENER_LIMITE_CONTRATO,QueryVivaObtenerLimiteContrato);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_OBTENER_MONEDA_LIMITE_OPERACION,QueryVivaObtenerMonedaLimiteOperacion);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_OBTENER_TIPO_INTERES_VARIABLE,QueryVivaObtenerTipoInteresVariable);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_SOBRETASA_FACTURA_FINANCIADA_CM,QueryVivaSobretasaFacturaFinanciadaCM);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_SOBRETASA_FACTURA_FINANCIADA_SM,QueryVivaSobretasaFacturaFinanciadaSM);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_SOBRETASA_PLAZOS_FACTURA_FINANCIADA_CM,QueryVivaSobretasaPlazosFacturaFinanciadaCM);
+				informacionReporteCarteraViva.put(ReporteCarteraVivaODS.CARTERAODS_QRY_SOBRETASA_PLAZOS_FACTURA_FINANCIADA_SM,QueryVivaSobretasaPlazosFacturaFinanciadaSM);
+				informacionReporteCarteraViva.put("fechaActual",fecha);
+				try {
+					entradaCarteraViva.setInformacionReporte(informacionReporteCarteraViva);
+					Document docReporteCarteraviva = new Document();
+					OutputStream os = docReporteCarteraviva.getOutputStream();
+		    		entradaCarteraViva.setReportesGenerado(os);
+		    		SalidaReportesBean salida = principal.generaReporteCarteraViva(entradaCarteraViva);
+					wfc.setWFContent("/Reporte/CodigoError",salida.getCodeError());
+					wfc.setWFContent("/Reporte/DescripcionError", salida.getErrorDescripcion());
+		    
+				if(salida.getCodeError().equals("OK00000")){
+					wfc.setWFContent("/Reporte/PrimaryDocument", docReporteCarteraviva);
+					wfc.setWFContent("/Reporte/NombreArchivo", salida.getNombreArchivo());
+				}else{	
+					wfc.setWFContent("/Reporte/ProcesoError", proceso);
+					return "-1";
+				}
+				}
+		
+			
+				 catch(NullPointerException e){
+					e.printStackTrace();
+					wfc.setWFContent("/Reporte/CodigoError", "Fallo proceso generacion documento  ERROR0001");
+					wfc.setWFContent("/Reporte/DescripcionError", "Fallo proceso generacion reporte carteraviva nullpointer" + e.getMessage());
+					return "-1";
+			}catch(Exception e) {
+				e.printStackTrace();
+				wfc.setWFContent("/Reporte/CodigoError", "Fallo proceso generacion documento  ERROR0001");
+				wfc.setWFContent("/Reporte/DescripcionError", "Fallo proceso generacion reporte carteraviva nullpointer" + e.getMessage());
+				return "-1";
+			}
+	  
+	
+					
+	return "0";
+
+	 
+	  
+
+
