@@ -1,0 +1,92 @@
+import com.sterlingcommerce.woodstock.workflow.Document;
+import java.util.Map;
+import java.util.HashMap;
+import java.io.OutputStream;
+import mx.santander.cnf.reportesComisiones.Main;
+import mx.santander.cnf.reportesComisiones.beans.EntradasReportesBean;
+import mx.santander.cnf.reportesComisiones.beans.SalidaReportesBean;
+import mx.santander.cnf.reportesComisiones.Utils.ConstantesReportesUtils;
+import mx.santander.cnf.reportesComisiones.Utils.AltasContratosComisionesConfimirngUtils;
+import mx.santander.cnf.reportesComisiones.Utils.BajasContratosComisionesConfimirngUtils;
+import mx.santander.cnf.reportesComisiones.Utils.ComisionesCobroConfirmingUtils;
+import mx.santander.cnf.reportesComisiones.Utils.OperacionesCobroComisionesConfimirngUtils;
+
+
+Main principal = new Main();
+EntradasReportesBean entrada = new EntradasReportesBean();
+Map informacionReporte = new HashMap();
+
+informacionReporte.put(ConstantesReportesUtils.POOL, wfc.getParm("Pool"));
+informacionReporte.put(ConstantesReportesUtils.CLASS_FORNAME, wfc.getParm("DriverClass"));
+
+String tipoReporte = wfc.getParm("TipoReporte");
+String fecha = wfc.getParm("Fecha");
+
+System.out.println("REPCOMISIONES: Inicio de generación de reporte " + tipoReporte + " de fecha " + fecha);
+
+if(tipoReporte.equals("ALTA")){
+	informacionReporte.put(AltasContratosComisionesConfimirngUtils.ALTACONTRATO_FECHAENTRADA, fecha);
+	informacionReporte.put(AltasContratosComisionesConfimirngUtils.ALTACONTRATO_QRY_ALTACONTRATO, wfc.getParm("QUERY_ALTAS_CONTRATO"));
+}else if(tipoReporte.equals("BAJA")){
+	informacionReporte.put(BajasContratosComisionesConfimirngUtils.BAJACONTRATO_FECHAENTRADA, fecha);
+	informacionReporte.put(BajasContratosComisionesConfimirngUtils.BAJACONTRATO_QRY_BAJACONTRATO, wfc.getParm("QUERY_BAJAS_CONTRATO"));
+}else if(tipoReporte.equals("COBRO")){
+	informacionReporte.put(ComisionesCobroConfirmingUtils.COMISIONESCOBRO_FECHAENTRADA, fecha);
+	informacionReporte.put(ComisionesCobroConfirmingUtils.COMISIONESCOBRO_QRY_ALTACONTRATO, wfc.getParm("QUERY_COMISIONES_COBRO"));
+}else if(tipoReporte.equals("OPERACIONES_COBRO")){
+	informacionReporte.put(OperacionesCobroComisionesConfimirngUtils.OPERACIONESCOBROCOMISIONES_FECHAENTRADA, fecha);
+	informacionReporte.put(OperacionesCobroComisionesConfimirngUtils.OPERACIONESCOBROCOMISIONES_QRY_OPERACIONESCOBRO, wfc.getParm("QUERY_OPERACIONES_COBRO"));
+	informacionReporte.put(OperacionesCobroComisionesConfimirngUtils.OPERACIONESCOBROCOMISIONES_QRY_OPERACIONESCOBROCFDI, wfc.getParm("QUERY_CFDI"));
+}else{
+	System.out.println("REPCOMISIONES: Reporte " + tipoReporte + " no reconocido");
+	return "-1";
+}
+
+entrada.setInformacionReporte(informacionReporte);
+
+try {
+	String proceso;
+	Document reporte = new Document();
+	OutputStream os = reporte.getOutputStream();
+	entrada.setReportesGenerado(os);
+	
+	SalidaReportesBean salida;
+	
+	if(tipoReporte.equals("ALTA")){
+		proceso = "reporteAltaContrato";
+		salida = principal.reporteAltaContrato(entrada);
+	}else if(tipoReporte.equals("BAJA")){
+		proceso = "reporteBajaContrato";
+		salida = principal.reporteBajaContrato(entrada);
+	}else if(tipoReporte.equals("COBRO")){
+		proceso = "reporteComisionesCobro";
+		salida = principal.reporteComisionesCobro(entrada);
+	}else{
+		proceso = "reporteOperacionesCobroComisiones";
+		salida = principal.reporteOperacionesCobroComisiones(entrada);
+	}
+	
+	wfc.setWFContent("/Reporte/CodigoError",salida.getCodeError());
+	wfc.setWFContent("/Reporte/DescripcionError", salida.getErrorDescripcion());
+	
+	if(salida.getCodeError().equals("OK00000")){
+		wfc.setWFContent("/Reporte/PrimaryDocument", reporte);
+		wfc.setWFContent("/Reporte/NombreArchivo", salida.getNombreArchivo());
+	}else{	
+		wfc.setWFContent("/Reporte/ProcesoError", proceso);
+		return "-1";
+	}
+}
+
+catch(NullPointerException e){
+        wfc.setWFContent("/Reporte/CodigoError", "Fallo proceso generacion documento reparto ERROR0001");
+        wfc.setWFContent("/Reporte/DescripcionError", "Fallo proceso generacion reporte comisiones nullpointer" + e.getMessage());
+        return "-1";
+}catch(Exception e) {
+	e.printStackTrace();
+	return "-1";
+}
+
+System.out.println("REPCOMISIONES: Generacion de reporte " + tipoReporte + " de fecha " + fecha + " finalizada");
+
+return "0";
