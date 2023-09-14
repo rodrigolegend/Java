@@ -20,3 +20,5 @@ ORDER BY tabname ASC;
 select * from trsftpincob
 
 ;
+
+"SELECT FIRST 1 NVL(tsflibor.pcreuter,0) AS pcreuter FROM tsflibor WHERE tsflibor.cdrefere = (SELECT cdrefere FROM tsftipos t WHERE t.cdinicia IN (SELECT cdinicia FROM tsftipos t2 WHERE  t2.cdrefere IN (71,72,73,76,82)) AND ? BETWEEN t.nudiamin AND t.nudiamax) AND tsflibor.cdmoneda = ? ORDER BY tsflibor.fhregtro DESC, tsflibor.nuordnfh DESC");
