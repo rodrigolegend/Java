@@ -33,3 +33,20 @@ public class ZipFileExample {
     }
 }
 
+public class CustomZipCompressor {
+    public static void main(String[] args) {
+        String archivo1 = "C:\\Users\\TuUsuario\\Documents\\archivo1.txt";
+        String archivo2 = "C:\\Users\\TuUsuario\\Documents\\archivo2.txt";
+        String archivoZip = "C:\\Users\\TuUsuario\\Documents\\ArchivoComprimido.ZIP";
+
+        try (FileOutputStream fos = new FileOutputStream(archivoZip);
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+            addToZipFile(archivo1, zos);
+            addToZipFile(archivo2, zos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Resto del código igual que en el ejemplo anterior
+}
